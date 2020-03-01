@@ -37,6 +37,10 @@
     font-weight: 400;
 }
 
+* {
+  font-family: Nunito-Regular, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
 h1 {
   font-family: Nunito-Bold;
   font-size: 30px;

@@ -3,16 +3,7 @@
 /* eslint-disable react/no-did-update-set-state */
 /* eslint-disable react/prop-types */
 import React from 'react';
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid
-} from 'recharts';
-import millify from 'millify';
+import Charty from 'react-charty';
 import { bindActionCreators, Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -23,37 +14,67 @@ import { enumerateDaysBetweenDates, dbDateConvert } from '../../../utils';
 import { mainColor } from '../../../constants';
 import { queryActivity } from '../model';
 
+const LIGHT_THEME = {
+  name: 'light',
+  grid: { color: '#182D3B', alpha: 0.1, markerFillColor: '#fff' },
+  legend: { background: '#fff', color: '#000' },
+  preview: {
+    maskColor: '#E2EEF9',
+    maskAlpha: 0.6,
+    brushColor: '#C0D1E1',
+    brushBorderColor: '#fff',
+    brushBorderAlpha: 1,
+    handleColor: '#fff'
+  },
+  xAxis: { textColor: '#8E8E93', textAlpha: 1 },
+  yAxis: { textColor: '#8E8E93', textAlpha: 1 },
+  title: { color: '#000' },
+  localRange: { color: '#000' },
+  zoomedRange: { color: '#000' },
+  zoomText: { color: '#108BE3' },
+  zoomIcon: { fill: '#108BE3' },
+  buttons: { color: '#fff' },
+  pie: { textColor: '#fff' },
+  body: { backgroundColor: '#fff', color: '#000', height: 0 },
+  noteColor: '#108BE3',
+  octoColor: '#fff'
+};
+
 class CalendarActivity extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      dataActivity: null
+      data: null
     };
   }
 
   async componentDidMount() {
     const { year } = this.props;
-    const dataActivity = await queryActivity(year);
-    this.setState({ dataActivity });
+    await this.setData(year);
   }
 
   async componentDidUpdate(prevProps) {
     const { year } = this.props;
     if (prevProps.year !== year) {
-      const dataActivity = await queryActivity(year);
-      this.setState({ dataActivity });
+      await this.setData(year);
     }
   }
 
-  handleClick(activeItem) {
+  async setData(year) {
+    const dataActivity = await queryActivity(year);
+    const days = enumerateDaysBetweenDates(`${year}-01-01`, `${year}-12-31`);
+    const data = { x: [], y0: [] };
+    days.forEach(d => {
+      const row = dataActivity.find(v => v.day === d);
+      data.x.push(dbDateConvert(d).getTime());
+      data.y0.push(row ? row.count : 0);
+    });
+    this.setState({ data });
+    this.forceUpdate();
+  }
+
+  handleClick(d) {
     const { setFirstDrawer } = this.props;
-    if (
-      !activeItem ||
-      !activeItem.activePayload ||
-      !activeItem.activePayload[0]
-    )
-      return;
-    const d = activeItem.activePayload[0].payload;
     if (d && d.time && !Number.isNaN(d.time)) {
       const day = Number(moment(d.time).format('YYYYMMDD'));
       setFirstDrawer('ChatList', { day });
@@ -61,59 +82,23 @@ class CalendarActivity extends React.Component {
   }
 
   render() {
-    const { year } = this.props;
-    const { dataActivity } = this.state;
+    const { data } = this.state;
 
-    if (!dataActivity) return <Spin />;
-
-    const days = enumerateDaysBetweenDates(`${year}-01-01`, `${year}-12-31`);
-    const data = days.map(d => {
-      const row = dataActivity.find(v => v.day === d);
-      const count = row ? row.count : 0;
-      return { time: dbDateConvert(d).getTime(), count };
-    });
+    if (!data) return <Spin />;
 
     return (
-      <ResponsiveContainer aspect={4} width="100%">
-        <AreaChart
-          data={data}
-          onClick={d => this.handleClick(d)}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5
-          }}
-        >
-          <YAxis
-            domain={['dataMin', 'dataMax']}
-            allowDecimals={false}
-            tickFormatter={v => millify(v, { precision: 0 })}
-          />
-          <CartesianGrid vertical={false} strokeDasharray="3 3" />
-          <Tooltip
-            formatter={v => [`${millify(v, { precision: 0 })} Messages`]}
-            labelFormatter={name => [moment(name).format('YYYY-MM-DD')]}
-          />
-          <Area
-            type="monotone"
-            dataKey="count"
-            animationDuration={300}
-            stroke={mainColor}
-            fillOpacity={0.3}
-            fill={mainColor}
-          />
-          <XAxis
-            dataKey="time"
-            scale="time"
-            domain={['auto', 'auto']}
-            tickCount={12}
-            name="Day"
-            tickFormatter={d => moment(d).format('MMM DD')}
-            type="number"
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      <Charty
+        title="Messages"
+        theme={LIGHT_THEME}
+        style={{ width: '100%' }}
+        yAxisType="number"
+        xAxisType="date"
+        rangeTextType="longDate"
+        names={{ y0: 'Messages' }}
+        colors={{ y0: mainColor }}
+        type="bar"
+        data={data}
+      />
     );
   }
 }

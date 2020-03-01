@@ -1156,6 +1156,11 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-charty@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/react-charty/-/react-charty-0.1.5.tgz#ac979d5e2502ae1b9c1b785f5338419010515f5a"
+  integrity sha512-WaAanEYI41HwxZ2S0VAZwduJuFVerReCxL8aS5bNpe8tEGq3OFQlHbgZb+0Nc2w3WZaPo6xuPV+DlWeuID0DSA==
+
 react-dom@16.12.0:
   version "16.12.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.12.0.tgz#0da4b714b8d13c2038c9396b54a92baea633fe11"

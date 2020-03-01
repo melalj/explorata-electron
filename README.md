@@ -1,66 +1,39 @@
 # Explorata
 
-Ask more from you social data
-<br>
+## What is it? 
+
+Explore your Facebook Messenger data with fun and meaningful visualisations. 
+
+Explorata is open-source and built upon the “privacy by design” principle. All data is processed locally — it even works offline.
+
+We aim to develop Explorata to accept more kinds of social data soon.  
+
+## How does it work?
+
+1. Download Explorata
+2. Download your data from Facebook (see how)
+3. Unzip your Facebook data folder and drop the ‘messages’ folder onto Explorata
+4. Dive into your data! 
+
+## Why did we build it?
+
+Ever wondered who are the people you message most? With whom you have the longest streaks? The day you exchanged most messages? Why?
+
+We have been on Facebook for years, exchanged thousands of messages and yet, stuck on their servers, our data remains unexplorable.
+
+## Features
+
+- Local processing of data (privacy-by-design)
+- Fun visualisations like most messaged people, streaks, chattiest days, and more!
+- Click on a person or a visualisation to see your conversations in context!
+
+## Stack
 
 <p>
-  Explorata is based out of the Electron React Boilerplate, and uses <a href="https://electron.atom.io/">Electron</a>, <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/redux">Redux</a>, <a href="https://github.com/reactjs/react-router">React Router</a>, <a href="https://webpack.github.io/docs/">Webpack</a> and <a href="https://github.com/gaearon/react-hot-loader">React Hot Loader</a> for rapid application development (HMR).
+  Explorata is based out of the Electron React Boilerplate, and uses <a href="hhttps://electron-react-boilerplate.js.org">Electron Boilerplate</a> with <a href="https://facebook.github.io/react/">React</a>, <a href="https://github.com/reactjs/redux">Redux</a>, <a href="https://ant.design">Ant.design</a>, <a href="http://recharts.org">Recharts</a> and <a href="https://github.com/react-dropzone/react-dropzone">React Dropzone</a>.
 </p>
 
-<br>
-
-<div align="center">
-  <a href="https://facebook.github.io/react/"><img src="./internals/img/react-padded-90.png" /></a>
-  <a href="https://webpack.github.io/"><img src="./internals/img/webpack-padded-90.png" /></a>
-  <a href="https://redux.js.org/"><img src="./internals/img/redux-padded-90.png" /></a>
-  <a href="https://github.com/ReactTraining/react-router"><img src="./internals/img/react-router-padded-90.png" /></a>
-  <a href="https://eslint.org/"><img src="./internals/img/eslint-padded-90.png" /></a>
-  <a href="https://facebook.github.io/jest/"><img src="./internals/img/jest-padded-90.png" /></a>
-  <a href="https://yarnpkg.com/"><img src="./internals/img/yarn-padded-90.png" /></a>
-</div>
-
-<hr />
-<br />
-
-<div align="center">
-
-[![Build Status](azure-pipelines-image)](azure-pipelines-url)
-[![Build Status][travis-image]][travis-url]
-[![Appveyor Build Status][appveyor-image]][appveyor-url]
-[![Dependency Status][david-image]][david-url]
-[![DevDependency Status][david-dev-image]][david-dev-url]
-[![Github Tag][github-tag-image]][github-tag-url]
-
-[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/electron-react-blpt)
-[![OpenCollective](https://opencollective.com/electron-react-boilerplate/backers/badge.svg)](#backers)
-[![OpenCollective](https://opencollective.com/electron-react-boilerplate/sponsors/badge.svg)](#sponsors)
-[![Good first issues open][good-first-issue-image]][good-first-issue-url]
-[![StackOverflow](https://img.shields.io/badge/stackoverflow-electron_react_boilerplate-blue.svg)](https://stackoverflow.com/questions/tagged/electron-react-boilerplate)
-
-</div>
-
-<div align="center">
-
-![Electron Boilerplate Demo](https://cloud.githubusercontent.com/assets/3382565/10557547/b1f07a4e-74e3-11e5-8d27-79ab6947d429.gif)
-
-</div>
-
 ## Install
-
-- **If you have installation or compilation issues with this project, please see [our debugging guide](https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues/400)**
-
-First, clone the repo via git:
-
-```bash
-git clone --depth 1 --single-branch --branch master https://github.com/electron-react-boilerplate/electron-react-boilerplate.git your-project-name
-```
-
-And then install the dependencies with yarn.
-
-```bash
-$ cd your-project-name
-$ yarn
-```
 
 ## Starting Development
 

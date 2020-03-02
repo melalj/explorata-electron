@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable react/no-did-update-set-state */
 /* eslint-disable react/prop-types */
 import React from 'react';
@@ -5,14 +8,16 @@ import { Statistic, Row, Col, Button, Card, Tag, Spin } from 'antd';
 import millify from 'millify';
 import { bindActionCreators, Dispatch } from 'redux';
 import { connect } from 'react-redux';
+import { ipcRenderer } from 'electron';
+import moment from 'moment';
 
-import { queryFriendProfile } from '../model';
 import * as Actions from '../../../state/actions';
 
 class FriendProfile extends React.Component {
   constructor(props) {
     super(props);
     this.mounted = false;
+    this.modelQuery = props.modelQuery;
     this.state = {
       dataFriendProfile: null
     };
@@ -20,7 +25,8 @@ class FriendProfile extends React.Component {
 
   async componentDidMount() {
     const { firstDrawer } = this.props;
-    const dataFriendProfile = await queryFriendProfile(
+    const dataFriendProfile = await ipcRenderer.invoke(
+      this.modelQuery,
       firstDrawer.filters.person
     );
     this.setState({ dataFriendProfile });
@@ -31,7 +37,9 @@ class FriendProfile extends React.Component {
     if (!this.mounted) return;
     const { firstDrawer } = this.props;
     if (prevProps.firstDrawer.filters !== firstDrawer.filters) {
-      const dataFriendProfile = await queryFriendProfile(
+      this.setState({ dataFriendProfile: null });
+      const dataFriendProfile = await ipcRenderer.invoke(
+        this.modelQuery,
         firstDrawer.filters.person
       );
       this.setState({ dataFriendProfile });
@@ -41,6 +49,19 @@ class FriendProfile extends React.Component {
   handleOpenConversationClick() {
     const { firstDrawer, setSecondDrawer } = this.props;
     setSecondDrawer('ChatMessages', firstDrawer.filters);
+  }
+
+  handleReadStreakClick({ streak, streakFrom }) {
+    const { firstDrawer, setSecondDrawer } = this.props;
+    const { person } = firstDrawer.filters;
+    const dayTo = moment(streakFrom);
+    dayTo.add(streak, 'days');
+    const filters = {
+      dayFrom: streakFrom,
+      person,
+      dayTo: dayTo.format('YYYY-MM-DD')
+    };
+    setSecondDrawer('ChatMessages', filters);
   }
 
   render() {
@@ -66,6 +87,7 @@ class FriendProfile extends React.Component {
             <Card>
               <Statistic title="Best streak" suffix="days" value={dt.streak} />
               <Tag color="purple">{`started on ${dt.streakFrom}`}</Tag>
+              <a onClick={() => this.handleReadStreakClick(dt)}>Read</a>
             </Card>
           </Col>
         </Row>

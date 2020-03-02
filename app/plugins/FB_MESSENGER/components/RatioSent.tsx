@@ -5,15 +5,16 @@ import React from 'react';
 import { Table, Select } from 'antd';
 import { bindActionCreators, Dispatch } from 'redux';
 import { connect } from 'react-redux';
+import { ipcRenderer } from 'electron';
 
 import * as Actions from '../../../state/actions';
-import { queryRatioSent } from '../model';
 
 const allTime = 'All Time';
 
 class RatioSent extends React.Component {
   constructor(props) {
     super(props);
+    this.modelQuery = props.modelQuery;
     this.state = {
       isReady: false,
       typeRatioSent: 'messages',
@@ -25,7 +26,8 @@ class RatioSent extends React.Component {
   async componentDidMount() {
     const { yearRatioSent, typeRatioSent } = this.state;
     const { isGhosters } = this.props;
-    const dataRatioSent = await queryRatioSent(
+    const dataRatioSent = await ipcRenderer.invoke(
+      this.modelQuery,
       yearRatioSent === allTime ? null : yearRatioSent,
       typeRatioSent,
       isGhosters
@@ -40,8 +42,9 @@ class RatioSent extends React.Component {
       prevState.yearRatioSent !== yearRatioSent ||
       prevState.typeRatioSent !== typeRatioSent
     ) {
-      const dataRatioSent = await queryRatioSent(
-        yearRatioSent === 'All Time' ? null : yearRatioSent,
+      const dataRatioSent = await ipcRenderer.invoke(
+        this.modelQuery,
+        yearRatioSent === allTime ? null : yearRatioSent,
         typeRatioSent,
         isGhosters
       );
@@ -80,7 +83,7 @@ class RatioSent extends React.Component {
         dataIndex: 'ratio',
         align: 'right',
         render: (text, record) => {
-          return `${(record.ratio || 0).toFixed(2)} for 1`;
+          return `${Number(record.ratio || 0).toFixed(2)} for 1`;
         }
       }
     ];

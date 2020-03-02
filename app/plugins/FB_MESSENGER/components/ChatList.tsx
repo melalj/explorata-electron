@@ -2,16 +2,17 @@
 /* eslint-disable react/no-did-update-set-state */
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { Avatar, List, Spin } from 'antd';
+import { Avatar, List, Spin, Button } from 'antd';
 import { bindActionCreators, Dispatch } from 'redux';
 import { connect } from 'react-redux';
+import { ipcRenderer } from 'electron';
 
-import { queryChatList } from '../model';
 import * as Actions from '../../../state/actions';
 
 class ChatList extends React.Component {
   constructor(props) {
     super(props);
+    this.modelQuery = props.modelQuery;
     this.state = {
       dataChatList: null
     };
@@ -19,23 +20,35 @@ class ChatList extends React.Component {
 
   async componentDidMount() {
     const { firstDrawer } = this.props;
-    const dataChatList = await queryChatList(firstDrawer.filters);
+
+    const dataChatList = await ipcRenderer.invoke(
+      this.modelQuery,
+      firstDrawer.filters
+    );
     this.setState({ dataChatList });
   }
 
   async componentDidUpdate(prevProps) {
     const { firstDrawer } = this.props;
     if (prevProps.firstDrawer.filters !== firstDrawer.filters) {
-      const dataChatList = await queryChatList(firstDrawer.filters);
+      this.setState({ dataChatList: null });
+      const dataChatList = await ipcRenderer.invoke(
+        this.modelQuery,
+        firstDrawer.filters
+      );
       this.setState({ dataChatList });
     }
   }
 
   handleItemClick(d) {
     const { firstDrawer, setSecondDrawer } = this.props;
-    const filters = { person: d.person };
-    if (firstDrawer.filters.day) filters.day = firstDrawer.filters.day;
+    const filters = { ...firstDrawer.filters, person: d.person };
     setSecondDrawer('ChatMessages', filters);
+  }
+
+  handleProfileClick(person) {
+    const { setFirstDrawer } = this.props;
+    setFirstDrawer('FriendProfile', { person });
   }
 
   render() {
@@ -46,15 +59,29 @@ class ChatList extends React.Component {
         dataSource={dataChatList}
         bordered
         renderItem={item => (
-          <List.Item key={item.id} onClick={() => this.handleItemClick(item)}>
+          <List.Item
+            key={item.id}
+            actions={[
+              <Button
+                key="profile"
+                onClick={() => this.handleProfileClick(item.person)}
+              >
+                Profile
+              </Button>,
+              <Button
+                key="messages"
+                type="primary"
+                onClick={() => this.handleItemClick(item)}
+              >
+                Read messages
+              </Button>
+            ]}
+          >
             <List.Item.Meta
               avatar={<Avatar>{item.person.substr(0, 1).toUpperCase()}</Avatar>}
               title={<a>{item.person}</a>}
               description={`${item.count} messages`}
             />
-            <div className="chatlist-time">
-              {new Date(item.timestamp).toISOString().split('T')[0]}
-            </div>
           </List.Item>
         )}
       />
@@ -71,6 +98,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch: Dispatch) {
   return bindActionCreators(
     {
+      setFirstDrawer: (t, f) => Actions.setFirstDrawer(t, f),
       setSecondDrawer: (t, f) => Actions.setSecondDrawer(t, f)
     },
     dispatch

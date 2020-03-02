@@ -2,60 +2,67 @@
 /* eslint-disable react/no-did-update-set-state */
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { Table, Select } from 'antd';
+import { Select, Table } from 'antd';
 import { bindActionCreators, Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { ipcRenderer } from 'electron';
 
+import moment from 'moment';
 import * as Actions from '../../../state/actions';
 
 const allTime = 'All Time';
 
-class MostMessaged extends React.Component {
+class BestStreaks extends React.Component {
   constructor(props) {
     super(props);
     this.modelQuery = props.modelQuery;
     this.state = {
       isReady: false,
-      yearMostMessaged: allTime,
-      dataMostMessaged: null
+      yearBestStreaks: allTime,
+      dataBestStreaks: null
     };
   }
 
   async componentDidMount() {
-    const { yearMostMessaged } = this.state;
-    const dataMostMessaged = await ipcRenderer.invoke(
+    const { yearBestStreaks } = this.state;
+    const dataBestStreaks = await ipcRenderer.invoke(
       this.modelQuery,
-      yearMostMessaged === allTime ? null : yearMostMessaged
+      yearBestStreaks === allTime ? null : yearBestStreaks
     );
-    this.setState({ dataMostMessaged, isReady: true });
+    this.setState({ dataBestStreaks, isReady: true });
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    const { yearMostMessaged } = this.state;
-    if (prevState.yearMostMessaged !== yearMostMessaged) {
-      const dataMostMessaged = await ipcRenderer.invoke(
+    const { yearBestStreaks } = this.state;
+    if (prevState.yearBestStreaks !== yearBestStreaks) {
+      const dataBestStreaks = await ipcRenderer.invoke(
         this.modelQuery,
-        yearMostMessaged === allTime ? null : yearMostMessaged
+        yearBestStreaks === allTime ? null : yearBestStreaks
       );
-      this.setState({ dataMostMessaged });
+      this.setState({ dataBestStreaks });
     }
   }
 
-  handleItemClick(d) {
+  handleClick(d) {
     const { setFirstDrawer } = this.props;
-    const filters = { person: d.person };
-    setFirstDrawer('FriendProfile', filters);
+    const dayTo = moment(d.streakFrom);
+    dayTo.add(d.streak, 'days');
+    const filters = {
+      dayFrom: d.streakFrom,
+      person: d.person,
+      dayTo: dayTo.format('YYYY-MM-DD')
+    };
+    setFirstDrawer('ChatList', filters);
   }
 
   render() {
-    const { dataMostMessaged, isReady, yearMostMessaged } = this.state;
+    const { dataBestStreaks, isReady, yearBestStreaks } = this.state;
     const { dataYears } = this.props;
 
-    if (!isReady || !dataMostMessaged) return null;
+    if (!isReady || !dataBestStreaks) return null;
 
-    const yearMostMessagedHandler = k => {
-      this.setState({ yearMostMessaged: k });
+    const yearBestStreaksHandler = k => {
+      this.setState({ yearBestStreaks: k });
     };
 
     const columns = [
@@ -66,9 +73,14 @@ class MostMessaged extends React.Component {
       },
       {
         title: '#',
-        dataIndex: 'count',
         align: 'right',
-        render: v => v.toLocaleString()
+        render: (v, d) => (
+          <div>
+            <b>{`${d.streak} days`}</b>
+            <br />
+            {`from ${d.streakFrom}`}
+          </div>
+        )
       }
     ];
 
@@ -77,9 +89,9 @@ class MostMessaged extends React.Component {
         <div>
           <div style={{ float: 'right' }}>
             <Select
-              defaultValue={yearMostMessaged}
+              defaultValue={yearBestStreaks}
               size="default"
-              onChange={y => yearMostMessagedHandler(y)}
+              onChange={y => yearBestStreaksHandler(y)}
             >
               <Select.Option key="0" value={allTime}>
                 {allTime}
@@ -92,20 +104,21 @@ class MostMessaged extends React.Component {
             </Select>
           </div>
           <h2>
-            <span role="img" aria-label="trophy">
-              🏆
+            <span role="img" aria-label="fire">
+              🔥
             </span>
-            Most Messaged
+            Best Streaks
           </h2>
         </div>
         <Table
           columns={columns}
           showHeader={false}
           onRow={record => ({
-            onClick: () => this.handleItemClick(record)
+            onClick: () => this.handleClick(record)
           })}
-          rowKey="person"
-          dataSource={dataMostMessaged}
+          rowKey="key"
+          pagination={{ pageSize: 7 }}
+          dataSource={dataBestStreaks}
           size="default"
         />
       </div>
@@ -122,4 +135,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   );
 }
 
-export default connect(null, mapDispatchToProps)(MostMessaged);
+export default connect(null, mapDispatchToProps)(BestStreaks);

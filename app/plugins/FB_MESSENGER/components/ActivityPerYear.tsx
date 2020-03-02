@@ -12,20 +12,21 @@ import {
 } from 'recharts';
 import millify from 'millify';
 import { Spin } from 'antd';
+import { ipcRenderer } from 'electron';
 
-import { queryActivity } from '../model';
 import { mainColor } from '../../../constants';
 
-export default class YearActivity extends Component {
+export default class ActivityPerYear extends Component {
   constructor(props) {
     super(props);
+    this.modelQuery = props.modelQuery;
     this.state = {
       dataActivity: null
     };
   }
 
   async componentDidMount() {
-    const dataActivity = await queryActivity();
+    const dataActivity = await ipcRenderer.invoke(this.modelQuery);
     this.setState({ dataActivity });
   }
 
@@ -43,13 +44,20 @@ export default class YearActivity extends Component {
 
   render() {
     const { dataActivity } = this.state;
+    const { years } = this.props;
     if (!dataActivity) return <Spin />;
+
+    const data = years.map(d => {
+      const row = dataActivity[String(d)];
+      const count = row ? Number(row) : 0;
+      return { year: d, count };
+    });
 
     return (
       <div style={{ margin: 10 }}>
         <ResponsiveContainer aspect={4} width="100%">
           <BarChart
-            data={dataActivity}
+            data={data}
             onClick={v => this.handleClick(v)}
             margin={{
               top: 5,

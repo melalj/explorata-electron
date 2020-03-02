@@ -7,13 +7,12 @@ import React from 'react';
 import { bindActionCreators, Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { Button } from 'antd';
-import { shell } from 'electron';
+import { shell, ipcRenderer } from 'electron';
 
 import * as Actions from '../state/actions';
 import { reports, screens } from '../constants';
 
 import ViewFbMessenger from '../plugins/FB_MESSENGER/view';
-import { init as initDbFbMessenger } from '../plugins/FB_MESSENGER/model';
 
 function goGithub() {
   shell.openExternal('https://www.github.com/melalj/explorata');
@@ -29,9 +28,11 @@ class Dashboard extends React.Component {
 
   async componentDidMount() {
     // Load Model and then
-    const { setLoading, droppedFiles } = this.props;
+    const { setLoading, droppedFiles, currentReport } = this.props;
     setLoading(true);
-    await initDbFbMessenger(droppedFiles);
+    if (currentReport === reports.FB_MESSENGER) {
+      await ipcRenderer.invoke('fbMessengerLoadDataset', droppedFiles);
+    }
     this.setState({ modelLoaded: true });
     setLoading(false);
   }

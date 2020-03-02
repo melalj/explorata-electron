@@ -14,8 +14,9 @@ class Drawers extends React.Component {
   getFirstDrawerTitle() {
     const { firstDrawer } = this.props;
     const { typeDrawer, filters } = firstDrawer;
-    if (typeDrawer === 'ChatList' && filters && filters.day) {
-      return `Messages on ${filters.day}`;
+    if (typeDrawer === 'ChatList' && filters) {
+      if (!filters.dayFrom) return 'Threads';
+      return `Threads from ${filters.dayFrom} to ${filters.dayTo}`;
     }
     if (typeDrawer === 'FriendProfile' && filters && filters.person) {
       return `${filters.person} Report`;

@@ -56,8 +56,13 @@ class ActivityPerYear extends React.Component {
       return;
     const d = activeItem.activePayload[0].payload;
     if (d && d.time && !Number.isNaN(d.time)) {
+      const dayTo = moment(d.time);
+      dayTo.add(1, 'day');
       const day = moment(d.time).format('YYYY-MM-DD');
-      setFirstDrawer('ChatList', { dayFrom: day, dayTo: day });
+      setFirstDrawer('ChatList', {
+        dayFrom: day,
+        dayTo: dayTo.format('YYYY-MM-DD')
+      });
     }
   }
 

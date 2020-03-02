@@ -33,7 +33,7 @@ class ChatMessages extends React.Component {
 
   async componentDidUpdate(prevProps, prevState) {
     const { secondDrawer } = this.props;
-    const { dayFrom, dayTo } = this.state;
+    const { dayFrom, dayTo, data } = this.state;
     if (prevProps.secondDrawer.filters !== secondDrawer.filters) {
       this.setState({
         data: null,
@@ -41,12 +41,20 @@ class ChatMessages extends React.Component {
         dayTo: secondDrawer.filters.dayTo || null
       });
     }
-    if (prevState.dayFrom !== dayFrom || prevState.dayTo !== dayTo) {
+
+    if (
+      prevState.dayFrom !== dayFrom ||
+      prevState.dayTo !== dayTo ||
+      (prevState.data && !data)
+    ) {
       this.setState({ data: null });
-      const data = await ipcRenderer.invoke(this.modelQuery, this.getFilters());
-      const toUpdate = { data };
-      if (!dayFrom) toUpdate.dayFrom = data[0].day;
-      if (!dayTo) toUpdate.dayTo = data[data.length - 1].day;
+      const newData = await ipcRenderer.invoke(
+        this.modelQuery,
+        this.getFilters()
+      );
+      const toUpdate = { data: newData };
+      if (!dayFrom) toUpdate.dayFrom = newData[0].day;
+      if (!dayTo) toUpdate.dayTo = newData[newData.length - 1].day;
       this.setState(toUpdate);
     }
   }

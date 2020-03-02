@@ -52,15 +52,30 @@ ipcMain.handle('fbMessengerLoadDataset', async (event, files) => {
         const content = decodeURIComponent(escape(String(m.content)));
         const emojiMatch = (content || '').match(emojiRegex);
         const date = new Date(m.timestamp_ms);
+        const countEmoji =
+          emojiMatch && emojiMatch.length ? emojiMatch.length : 0;
+        const countGif = Array.isArray(m.gifs) ? m.gifs.length : 0;
+        const countPhoto = Array.isArray(m.photos) ? m.photos.length : 0;
+
+        const verboseContent = [];
+        if (countPhoto > 1) verboseContent.push(`[${countPhoto} photos]`);
+        if (countPhoto === 1) verboseContent.push('[1 photo]');
+        if (countGif > 1) verboseContent.push(`[${countGif} GIFs]`);
+        if (countGif === 1) verboseContent.push('[1 GIF]');
+
+        const formattedContent =
+          content === 'undefined' || content === ''
+            ? verboseContent.join(', ')
+            : content;
 
         const row = {
           person,
           sender: senderName === me ? null : person,
           receiver: senderName !== me ? null : person,
-          content,
-          countEmoji: emojiMatch && emojiMatch.length ? emojiMatch.length : 0,
-          countGif: Array.isArray(m.gifs) ? m.gifs.length : 0,
-          countPhoto: Array.isArray(m.photos) ? m.photos.length : 0,
+          content: formattedContent,
+          countEmoji,
+          countGif,
+          countPhoto,
           timestamp: m.timestamp_ms,
           day: date.toISOString().split('T')[0],
           date,
@@ -223,6 +238,12 @@ ipcMain.handle('fbMessengerQueryYears', () => {
   return d3Range(yearMin, new Date().getFullYear() + 1, 1);
 });
 
+// GET FRIENDS
+ipcMain.handle('fbMessengerGetFriends', () => {
+  if (!fbMessengerDatasetByPerson) return null;
+  return Object.keys(fbMessengerDatasetByPerson);
+});
+
 function getStreaks(dataset) {
   const activeDays = new Set();
   dataset.forEach(d => {
@@ -342,6 +363,10 @@ ipcMain.handle('fbMessengerQueryFriendProfile', (event, person) => {
     messagesReceived: dataset.filter(d => !d.receiver).length,
     gifSent: d3Sum(dataset.filter(d => !d.sender).map(d => d.countGif)),
     gifReceived: d3Sum(dataset.filter(d => !d.receiver).map(d => d.countGif)),
+    emojiSent: d3Sum(dataset.filter(d => !d.sender).map(d => d.countEmoji)),
+    emojiReceived: d3Sum(
+      dataset.filter(d => !d.receiver).map(d => d.countEmoji)
+    ),
     mostSentEmoji,
     mostReceivedEmoji,
     streak,

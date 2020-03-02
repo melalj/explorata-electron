@@ -137,6 +137,7 @@ class FriendProfile extends React.Component {
                         .join(' ')
                 }`}
               />
+              <Tag color="purple">{`${dt.emojiSent} total`}</Tag>
             </Card>
           </Col>
           <Col span={12}>
@@ -152,6 +153,7 @@ class FriendProfile extends React.Component {
                         .join(' ')
                 }`}
               />
+              <Tag color="purple">{`${dt.emojiReceived} total`}</Tag>
             </Card>
           </Col>
         </Row>

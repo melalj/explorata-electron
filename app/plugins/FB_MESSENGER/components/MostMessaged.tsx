@@ -92,7 +92,7 @@ class MostMessaged extends React.Component {
             </Select>
           </div>
           <h2>
-            <span role="img" aria-label="trophy">
+            <span role="img" aria-label="trophy" className="emoji">
               🏆
             </span>
             Most Messaged

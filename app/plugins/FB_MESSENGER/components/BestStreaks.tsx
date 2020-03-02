@@ -104,7 +104,7 @@ class BestStreaks extends React.Component {
             </Select>
           </div>
           <h2>
-            <span role="img" aria-label="fire">
+            <span role="img" aria-label="emoji" className="emoji">
               🔥
             </span>
             Best Streaks

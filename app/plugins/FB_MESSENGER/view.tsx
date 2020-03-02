@@ -9,6 +9,7 @@ import MostMessaged from './components/MostMessaged';
 import BestStreaks from './components/BestStreaks';
 import RatioSent from './components/RatioSent';
 import Drawers from './components/Drawers';
+import SearchFriend from './components/SearchFriend';
 
 export default class ViewFbMessenger extends React.Component {
   constructor(props) {
@@ -31,6 +32,7 @@ export default class ViewFbMessenger extends React.Component {
       <div>
         <Drawers />
         <Divider />
+        <SearchFriend modelQuery="fbMessengerGetFriends" />
         <MessengerActivity dataYears={dataYears} />
         <br />
         <Row gutter={28}>

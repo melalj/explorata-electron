@@ -125,7 +125,12 @@ class RatioSent extends React.Component {
               ))}
             </Select>
           </div>
-          <h2>{isGhosters ? '👻Ghosters' : '🗣Talkers'}</h2>
+          <h2>
+            <span role="img" aria-label="emoji" className="emoji">
+              {isGhosters ? '👻' : '🗣'}
+            </span>
+            {isGhosters ? 'Ghosters' : 'Talkers'}
+          </h2>
         </div>
         <Table
           columns={columns}

@@ -226,14 +226,14 @@ ipcMain.handle('fbMessengerQueryYears', () => {
 function getStreaks(dataset) {
   const activeDays = new Set();
   dataset.forEach(d => {
-    const time = new Date(d.day).getTime();
-    if (!activeDays.has(time)) activeDays.add(time);
+    const day = moment(d.timestamp).format('YYYYMMDD');
+    if (!activeDays.has(day)) activeDays.add(day);
   });
 
   const activeDaysArray = Array.from(activeDays);
   activeDaysArray.sort();
-  const mStartDate = moment(d3Min(activeDaysArray));
-  const mEndDate = moment(d3Max(activeDaysArray));
+  const mStartDate = moment(String(d3Min(activeDaysArray)), 'YYYYMMDD');
+  const mEndDate = moment(String(d3Max(activeDaysArray)), 'YYYYMMDD');
 
   const now = mStartDate;
   let rowNumber = 0;

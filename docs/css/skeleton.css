@@ -25,21 +25,11 @@
 - Media Queries
 */
 
-
-@font-face {
-  font-family: 'Nunito-Regular';
-  src:  url('/images/Nunito-Regular.woff2') format('woff2');
+* {
+  font-family: "Nunito", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-
-
-@font-face {
-  font-family: 'Nunito-Bold';
-  src:  url('/images/Nunito-Bold.woff2') format('woff2');
-}
-
 
 h1 {
-  font-family: Nunito-Bold;
   font-size: 30px;
 }
 
@@ -243,9 +233,6 @@ are based on 10px sizing. So basically 1.5rem = 15px :) */
 html {
   font-size: 62.5%; }
 
-  * {
-    font-family: "Nunito-Regular", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  }
 body {
   font-size: 2.2em; /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
@@ -300,7 +287,7 @@ input[type="button"] {
   color: #8F00FF;
   text-align: center;
   font-size: 22px;
-  font-family: Nunito-Bold;
+  font-weight: bold;
   line-height: 38px;
   letter-spacing: normal;
   text-decoration: none;

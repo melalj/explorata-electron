@@ -34,9 +34,7 @@ export function setDroppedFiles(droppedFiles) {
 export const SET_ERROR = 'SET_ERROR';
 export function setError(err) {
   if (err) {
-    console.error(
-      `[Client Side Error] ${err.message} (${err.stack.replace(/\n/g, ', ')})`
-    );
+    console.error(`[Client Side Error] ${err.message}`);
   }
   const error = !err
     ? null

@@ -10,10 +10,9 @@ import classNames from 'classnames';
 import { bindActionCreators, Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { Button } from 'antd';
-import { shell } from 'electron';
+import { shell, ipcRenderer } from 'electron';
 
 import { screens } from '../constants';
-import { detectDatasetName } from '../utils';
 import * as Actions from '../state/actions';
 
 function handleInstructionsClick(e) {
@@ -44,14 +43,16 @@ class Dropfiles extends React.Component {
       return null;
     }
 
+    const droppedFiles = files.map(d => d.path);
+
     // Detect dataset name
-    const datasetName = await detectDatasetName(files);
+    const datasetName = await ipcRenderer.invoke('detectDataset', droppedFiles);
     if (!datasetName) {
       setError('No dataset detected'); // TODO: dispatch error
       return null;
     }
 
-    setDroppedFiles(files);
+    setDroppedFiles(droppedFiles);
     setCurrentReport(datasetName);
     setLoading(false);
     goReport();

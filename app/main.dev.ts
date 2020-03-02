@@ -9,11 +9,9 @@
  * When running `yarn build` or `yarn build-main`, this file is compiled to
  * `./app/main.prod.js` using webpack. This gives us some performance wins.
  */
-import fs from 'fs-extra';
 import path from 'path';
-import Database from 'better-sqlite3';
 import url from 'url';
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import MenuBuilder from './menu';
 
 let mainWindow: BrowserWindow | null = null;
@@ -112,56 +110,6 @@ app.on('activate', () => {
 });
 
 //
-// IPC
-
-// DB
-let db;
-let insertMany;
-ipcMain.handle('dbInit', async (event, settings) => {
-  const datasetName = settings.name;
-  const dbPath = path.join(app.getPath('appData'), `${datasetName}.sqlite`);
-  await fs.remove(dbPath);
-
-  db = new Database(dbPath);
-  db.exec(settings.schema);
-
-  insertMany = (table, columns) => {
-    const insert = db.prepare(`
-      INSERT INTO ${table} (${columns.join(', ')})
-      VALUES (@${columns.join(', @')})
-    `);
-    return db.transaction(msgs => {
-      for (let i = 0; i < msgs.length; i += 1) insert.run(msgs[i]);
-    });
-  };
-  return true;
-});
-
-ipcMain.handle('dbInsertMany', async (event, table, columns, data) => {
-  if (!insertMany) return null; // TODO: Improve error handling
-  insertMany(table, columns)(data);
-  return true;
-});
-
-ipcMain.handle('dbFetchOne', async (event, query, params) => {
-  if (!db) return null; // TODO: Improve error handling
-  const res = await db.prepare(query).get(params || {});
-  return res;
-});
-
-ipcMain.handle('dbFetchMany', async (event, query, params) => {
-  if (!db) return null; // TODO: Improve error handling
-  const res = await db.prepare(query).all(params || {});
-  return res;
-});
-
-// FILESYSTEM
-ipcMain.handle('readFile', async (event, ...args) => {
-  const res = await fs.readFile(...args);
-  return res;
-});
-
-ipcMain.handle('readJSON', async (event, ...args) => {
-  const res = await fs.readJSON(...args);
-  return res;
-});
+// IPC - Models
+require('./plugins/FB_MESSENGER/model');
+require('./plugins/detectDataset');

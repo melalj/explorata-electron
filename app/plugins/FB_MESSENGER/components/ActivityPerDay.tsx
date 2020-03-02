@@ -17,15 +17,16 @@ import { bindActionCreators, Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { Spin } from 'antd';
+import { ipcRenderer } from 'electron';
 
 import * as Actions from '../../../state/actions';
-import { enumerateDaysBetweenDates, dbDateConvert } from '../../../utils';
+import { enumerateDaysBetweenDates } from '../../../utils';
 import { mainColor } from '../../../constants';
-import { queryActivity } from '../model';
 
-class CalendarActivity extends React.Component {
+class ActivityPerYear extends React.Component {
   constructor(props) {
     super(props);
+    this.modelQuery = props.modelQuery;
     this.state = {
       dataActivity: null
     };
@@ -33,14 +34,14 @@ class CalendarActivity extends React.Component {
 
   async componentDidMount() {
     const { year } = this.props;
-    const dataActivity = await queryActivity(year);
+    const dataActivity = await ipcRenderer.invoke(this.modelQuery, year);
     this.setState({ dataActivity });
   }
 
   async componentDidUpdate(prevProps) {
     const { year } = this.props;
     if (prevProps.year !== year) {
-      const dataActivity = await queryActivity(year);
+      const dataActivity = await ipcRenderer.invoke(this.modelQuery, year);
       this.setState({ dataActivity });
     }
   }
@@ -55,8 +56,8 @@ class CalendarActivity extends React.Component {
       return;
     const d = activeItem.activePayload[0].payload;
     if (d && d.time && !Number.isNaN(d.time)) {
-      const day = Number(moment(d.time).format('YYYYMMDD'));
-      setFirstDrawer('ChatList', { day });
+      const day = moment(d.time).format('YYYY-MM-DD');
+      setFirstDrawer('ChatList', { dayFrom: day, dayTo: day });
     }
   }
 
@@ -68,9 +69,9 @@ class CalendarActivity extends React.Component {
 
     const days = enumerateDaysBetweenDates(`${year}-01-01`, `${year}-12-31`);
     const data = days.map(d => {
-      const row = dataActivity.find(v => v.day === d);
-      const count = row ? row.count : 0;
-      return { time: dbDateConvert(d).getTime(), count };
+      const row = dataActivity[d];
+      const count = row ? Number(row) : 0;
+      return { time: new Date(d).getTime(), count };
     });
 
     return (
@@ -88,11 +89,13 @@ class CalendarActivity extends React.Component {
           <YAxis
             domain={['dataMin', 'dataMax']}
             allowDecimals={false}
-            tickFormatter={v => millify(v, { precision: 0 })}
+            tickFormatter={v => millify(Number(v), { precision: 0 })}
           />
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <Tooltip
-            formatter={v => [`${millify(v, { precision: 0 })} Messages`]}
+            formatter={v => [
+              `${millify(Number(v), { precision: 0 })} Messages`
+            ]}
             labelFormatter={name => [moment(name).format('YYYY-MM-DD')]}
           />
           <Area
@@ -127,4 +130,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   );
 }
 
-export default connect(null, mapDispatchToProps)(CalendarActivity);
+export default connect(null, mapDispatchToProps)(ActivityPerYear);

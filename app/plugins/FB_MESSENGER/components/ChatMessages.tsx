@@ -2,40 +2,86 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { Spin } from 'antd';
+import { Spin, DatePicker, Divider, Empty } from 'antd';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
+import { ipcRenderer } from 'electron';
+import moment from 'moment';
 
-import { queryChatMessages } from '../model';
+const { RangePicker } = DatePicker;
+const dateFormat = 'YYYY-MM-DD';
 
 class ChatMessages extends React.Component {
   constructor(props) {
     super(props);
+    this.modelQuery = props.modelQuery;
     this.state = {
-      data: null
+      data: null,
+      dayFrom: props.secondDrawer.filters.dayFrom || null,
+      dayTo: props.secondDrawer.filters.dayTo || null
     };
   }
 
   async componentDidMount() {
-    const { secondDrawer } = this.props;
-    const data = await queryChatMessages(secondDrawer.filters);
-    this.setState({ data });
+    const { dayFrom, dayTo } = this.state;
+    const data = await ipcRenderer.invoke(this.modelQuery, this.getFilters());
+    const toUpdate = { data };
+    if (!dayFrom) toUpdate.dayFrom = data[0].day;
+    if (!dayTo) toUpdate.dayTo = data[data.length - 1].day;
+    this.setState(toUpdate);
   }
 
-  async componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps, prevState) {
     const { secondDrawer } = this.props;
+    const { dayFrom, dayTo } = this.state;
     if (prevProps.secondDrawer.filters !== secondDrawer.filters) {
-      const data = await queryChatMessages(secondDrawer.filters);
+      this.setState({ data: null });
+      const data = await ipcRenderer.invoke(this.modelQuery, this.getFilters());
+      const toUpdate = { data };
+      if (!dayFrom) toUpdate.dayFrom = data[0].day;
+      if (!dayTo) toUpdate.dayTo = data[data.length - 1].day;
+      this.setState(toUpdate);
+    }
+    if (prevState.dayFrom !== dayFrom || prevState.dayTo !== dayTo) {
+      this.setState({ data: null });
+      const data = await ipcRenderer.invoke(this.modelQuery, this.getFilters());
       this.setState({ data });
     }
   }
 
+  getFilters() {
+    const { dayFrom, dayTo } = this.state;
+    const { secondDrawer } = this.props;
+    return {
+      person: secondDrawer.filters.person,
+      dayFrom,
+      dayTo
+    };
+  }
+
+  handleDateChange(r) {
+    this.setState({
+      dayFrom: r[0].format(dateFormat),
+      dayTo: r[1].format(dateFormat)
+    });
+  }
+
   render() {
-    const { data } = this.state;
+    const { data, dayFrom, dayTo } = this.state;
     if (!data) return <Spin />;
+
+    if (!data.length) return <Empty />;
     return (
       <section className="discussion">
-        {data.map((d, i) => {
+        <RangePicker
+          defaultValue={[
+            moment(dayFrom, dateFormat),
+            moment(dayTo, dateFormat)
+          ]}
+          onCalendarChange={v => this.handleDateChange(v)}
+        />
+        <Divider />
+        {data.slice(0, 5000).map((d, i) => {
           const p = d.sender ? 'sender' : 'receiver';
 
           const isMiddle =

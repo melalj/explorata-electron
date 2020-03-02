@@ -1,16 +1,14 @@
 /* eslint-disable react/no-did-update-set-state */
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { min, range } from 'd3-array';
 import { Row, Col, Divider } from 'antd';
+import { ipcRenderer } from 'electron';
 
 import MessengerActivity from './components/MessengerActivity';
 import MostMessaged from './components/MostMessaged';
-import Chattiest from './components/Chattiest';
+import BestStreaks from './components/BestStreaks';
 import RatioSent from './components/RatioSent';
 import Drawers from './components/Drawers';
-
-import { queryYears } from './model';
 
 export default class ViewFbMessenger extends React.Component {
   constructor(props) {
@@ -21,9 +19,7 @@ export default class ViewFbMessenger extends React.Component {
   }
 
   async componentDidMount() {
-    const rawYears = await queryYears();
-    const yearMin = min(rawYears);
-    const dataYears = range(yearMin, new Date().getFullYear() + 1, 1);
+    const dataYears = await ipcRenderer.invoke('fbMessengerQueryYears');
     this.setState({ dataYears });
   }
 
@@ -39,18 +35,31 @@ export default class ViewFbMessenger extends React.Component {
         <br />
         <Row gutter={28}>
           <Col span={12}>
-            <MostMessaged dataYears={dataYears} />
+            <MostMessaged
+              modelQuery="fbMessengerQueryMostMessaged"
+              dataYears={dataYears}
+            />
           </Col>
           <Col span={12}>
-            <Chattiest dataYears={dataYears} />
+            <BestStreaks
+              modelQuery="fbMessengerQueryBestStreaks"
+              dataYears={dataYears}
+            />
           </Col>
         </Row>
         <Row gutter={28}>
           <Col span={12}>
-            <RatioSent dataYears={dataYears} isGhosters />
+            <RatioSent
+              modelQuery="fbMessengerQueryRatioSent"
+              dataYears={dataYears}
+            />
           </Col>
           <Col span={12}>
-            <RatioSent dataYears={dataYears} />
+            <RatioSent
+              modelQuery="fbMessengerQueryRatioSent"
+              dataYears={dataYears}
+              isGhosters
+            />
           </Col>
         </Row>
       </div>

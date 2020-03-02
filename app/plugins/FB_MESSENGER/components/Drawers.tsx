@@ -9,17 +9,13 @@ import * as Actions from '../../../state/actions';
 import ChatList from './ChatList';
 import ChatMessages from './ChatMessages';
 import FriendProfile from './FriendProfile';
-import { dbDateConvert } from '../../../utils';
 
 class Drawers extends React.Component {
   getFirstDrawerTitle() {
     const { firstDrawer } = this.props;
     const { typeDrawer, filters } = firstDrawer;
     if (typeDrawer === 'ChatList' && filters && filters.day) {
-      const d = dbDateConvert(filters.day)
-        .toISOString()
-        .split('T')[0];
-      return `Messages on ${d}`;
+      return `Messages on ${filters.day}`;
     }
     if (typeDrawer === 'FriendProfile' && filters && filters.person) {
       return `${filters.person} Report`;
@@ -39,11 +35,11 @@ class Drawers extends React.Component {
   getFirstDrawerContent() {
     const { firstDrawer } = this.props;
     const { typeDrawer, filters } = firstDrawer;
-    if (typeDrawer === 'ChatList' && filters && filters.day) {
-      return <ChatList />;
+    if (typeDrawer === 'ChatList' && filters) {
+      return <ChatList modelQuery="fbMessengerQueryChatList" />;
     }
     if (typeDrawer === 'FriendProfile' && filters) {
-      return <FriendProfile />;
+      return <FriendProfile modelQuery="fbMessengerQueryFriendProfile" />;
     }
     return null;
   }
@@ -53,7 +49,7 @@ class Drawers extends React.Component {
     const { typeDrawer, filters } = secondDrawer;
 
     if (typeDrawer === 'ChatMessages' && filters && filters.person) {
-      return <ChatMessages />;
+      return <ChatMessages modelQuery="fbMessengerQueryChatMessages" />;
     }
     return null;
   }
@@ -69,7 +65,7 @@ class Drawers extends React.Component {
     return (
       <Drawer
         title={this.getFirstDrawerTitle()}
-        width={600}
+        width={700}
         closable={false}
         onClose={hideFirstDrawer}
         visible={firstDrawer.visible}

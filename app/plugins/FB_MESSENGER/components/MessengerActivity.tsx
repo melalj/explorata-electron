@@ -3,8 +3,8 @@
 import React from 'react';
 import { Tabs } from 'antd';
 
-import CalendarActivity from './CalendarActivity';
-import YearActivity from './YearActivity';
+import ActivityPerDay from './ActivityPerDay';
+import ActivityPerYear from './ActivityPerYear';
 
 const { TabPane } = Tabs;
 
@@ -64,9 +64,16 @@ export default class MessengerActivity extends React.Component {
           ))}
         </Tabs>
         {yearActivity ? (
-          <CalendarActivity year={yearActivity} />
+          <ActivityPerDay
+            modelQuery="fbMessengerQueryActivityPerDay"
+            year={yearActivity}
+          />
         ) : (
-          <YearActivity onClick={d => this.changeYearTab(d.year)} />
+          <ActivityPerYear
+            modelQuery="fbMessengerQueryActivityPerYear"
+            years={dataYears}
+            onClick={d => this.changeYearTab(d.year)}
+          />
         )}
       </div>
     );

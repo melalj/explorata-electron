@@ -25,23 +25,11 @@
 - Media Queries
 */
 
-
-@font-face {
-  font-family: 'Nunito-Regular';
-  src:  url('/images/Nunito-Regular.woff2') format('woff2'),
-        url('/images/Nunito-Regular.ttf') format('truetype');
+* {
+  font-family: "Nunito", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-
-
-@font-face {
-  font-family: 'Nunito-Bold';
-  src:  url('/images/Nunito-Bold.woff2') format('woff2'),
-        url('/images/Nunito-Bold.ttf') format('truetype');
-}
-
 
 h1 {
-  font-family: Nunito-Bold;
   font-size: 30px;
 }
 
@@ -248,7 +236,6 @@ body {
   font-size: 2.2em; /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
   font-weight: 400;
-  font-family: "Nunito-Regular", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #222;
   background-color: #FDFAFF; }
 
@@ -299,7 +286,7 @@ input[type="button"] {
   color: #8F00FF;
   text-align: center;
   font-size: 22px;
-  font-family: Nunito-Bold;
+  font-weight: bold;
   line-height: 38px;
   letter-spacing: normal;
   text-decoration: none;

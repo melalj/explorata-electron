@@ -28,15 +28,13 @@
 
 @font-face {
   font-family: 'Nunito-Regular';
-  src:  url('/images/Nunito-Regular.woff2') format('woff2'),
-        url('/images/Nunito-Regular.ttf') format('truetype');
+  src:  url('/images/Nunito-Regular.woff2') format('woff2');
 }
 
 
 @font-face {
   font-family: 'Nunito-Bold';
-  src:  url('/images/Nunito-Bold.woff2') format('woff2'),
-        url('/images/Nunito-Bold.ttf') format('truetype');
+  src:  url('/images/Nunito-Bold.woff2') format('woff2');
 }
 
 
@@ -244,11 +242,14 @@ html is set to 62.5% so that all the REM measurements throughout Skeleton
 are based on 10px sizing. So basically 1.5rem = 15px :) */
 html {
   font-size: 62.5%; }
+
+  * {
+    font-family: "Nunito-Regular", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
 body {
   font-size: 2.2em; /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
   font-weight: 400;
-  font-family: "Nunito-Regular", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #222;
   background-color: #FDFAFF; }
 
